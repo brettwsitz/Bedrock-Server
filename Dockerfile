@@ -11,25 +11,20 @@ WORKDIR /server
 # 
 # This command relies on the specific HTML structure of the Minecraft download page, 
 # so if the page structure changes in the future, the command may need to be adjusted accordingly
+# 
+# Microsoft restricts site access with curl so a user agent must be spoofed
 ENV USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-# RUN curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.minecraft.net/en-us/download/server/bedrock" |\
-#     grep -o "https://minecraft.azureedge.net/bin-linux-preview/bedrock-server-.*\.zip" |\
-#     curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" 
+RUN curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.minecraft.net/en-us/download/server/bedrock" |\
+    grep -o "https://minecraft.azureedge.net/bin-linux-preview/bedrock-server-.*\.zip" |\
+    xargs curl -o bedrock-server.zip
 
-RUN curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"\
-            "$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.minecraft.net/en-us/download/server/bedrock" |\
-            grep -o "https://minecraft.azureedge.net/bin-linux-preview/bedrock-server-.*\.zip")"
+RUN unzip bedrock-server.zip
 
-    
+RUN chmod +x ./bedrock_server
 
-# Unzip the file using pattern matching
-RUN find . -type f -regex '.*bedrock-server-.*\.zip$' -exec unzip {} \;
+EXPOSE 19132/udp 19133/udp
 
-# Add executable permissions 
-# RUN chmod +x ./bedrock_server
-
-# Start the Minecraft Bedrock Server
-# CMD ./bedrock_server
+CMD LD_LIBRARY_PATH=. ./bedrock_server
 
 # Keep the container running without a process (for debugging ONLY)
-CMD tail -f /dev/null
+# CMD tail -f /dev/null
