@@ -15,7 +15,7 @@ WORKDIR /server
 # Microsoft restricts site access with curl so a user agent must be spoofed
 ENV USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 RUN curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.minecraft.net/en-us/download/server/bedrock" |\
-    grep -o "https://minecraft.azureedge.net/bin-linux-preview/bedrock-server-.*\.zip" |\
+    grep -o "https://minecraft.azureedge.net/bin-linux/bedrock-server-.*\.zip" |\
     xargs curl -o bedrock-server.zip
 
 RUN unzip bedrock-server.zip
