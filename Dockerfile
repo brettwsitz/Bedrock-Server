@@ -1,10 +1,8 @@
 FROM ubuntu
 
-ENV TTY=TRUE
-
 RUN apt-get update && apt-get install -y curl unzip
 
-RUN mkdir /server && cd /server
+RUN mkdir /server && mkdir /server/worlds && cd /server
 WORKDIR /server
 
 ##################################################################################################################
@@ -20,6 +18,8 @@ RUN curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KH
     xargs curl -o bedrock-server.zip
 
 RUN unzip bedrock-server.zip
+
+COPY configuration/* /server 
 
 RUN chmod +x ./bedrock_server
 
