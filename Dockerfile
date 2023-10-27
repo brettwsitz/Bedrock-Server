@@ -1,6 +1,7 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install -y curl unzip
+RUN apt-get update && apt-get install -y curl unzip python3 python3-pip
+RUN pip3 install schedule google-auth google-auth-oauthlib google-api-python-client
 
 RUN mkdir /server && mkdir /server/worlds && cd /server
 WORKDIR /server
@@ -16,16 +17,18 @@ WORKDIR /server
 RUN curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://www.minecraft.net/en-us/download/server/bedrock" |\
     grep -o "https://minecraft.azureedge.net/bin-linux/bedrock-server-.*\.zip" |\
     xargs curl -o bedrock-server.zip
-
 RUN unzip bedrock-server.zip
+RUN chmod +x ./bedrock_server
 
 COPY configuration/* /server 
 
-RUN chmod +x ./bedrock_server
+COPY automatic_backups/* /server
+RUN chmod +x backup.py
+RUN chmod +x drive.py
 
-EXPOSE 19132/udp 19133/udp
+EXPOSE 19132/udp 19133/udp 443/tcp
 
-CMD LD_LIBRARY_PATH=. ./bedrock_server
+CMD ["sh", "-c", "python3 backup.py & LD_LIBRARY_PATH=. ./bedrock_server"]
 
 # Keep the container running without a process (for debugging ONLY)
 # CMD tail -f /dev/null
