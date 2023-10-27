@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN apt-get update && apt-get install -y curl unzip python3 python3-pip
-RUN pip3 install schedule google-auth google-auth-oauthlib google-api-python-client
+RUN pip3 install pytz schedule google-auth google-auth-oauthlib google-api-python-client
 
 RUN mkdir /server && mkdir /server/worlds && cd /server
 WORKDIR /server
